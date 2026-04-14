@@ -2,7 +2,7 @@ import type {
   BrandGeneratePayload,
   GeneratedWebsite,
   GenerateWebsiteInput,
-  WebsiteSection,
+  WebsiteTheme,
 } from "@/lib/generate-website-types"
 
 function trim(s: string, max: number): string {
@@ -74,13 +74,44 @@ const GOAL_COPY: Record<string, { label: string; cta: string; blurb: string }> =
   },
 }
 
-function formatServicesList(services: string): string {
-  const lines = services
+function splitServiceItems(services: string): Array<{ title: string; description: string }> {
+  const parsed = services
     .split(/[\n,]+/)
     .map((s) => s.trim())
     .filter(Boolean)
-  if (lines.length === 0) return "• Custom services tailored to your customers"
-  return lines.map((l) => (l.startsWith("•") || l.startsWith("-") ? l : `• ${l}`)).join("\n")
+    .slice(0, 6)
+
+  if (parsed.length === 0) {
+    return [
+      { title: "Custom Consulting", description: "Tailored guidance designed around your business goals." },
+      { title: "Implementation", description: "End-to-end execution with clear timelines and regular updates." },
+      { title: "Ongoing Support", description: "Reliable follow-through so your team stays confident post-launch." },
+    ]
+  }
+
+  return parsed.map((title) => ({
+    title,
+    description: `A results-focused ${title.toLowerCase()} service crafted to improve customer outcomes.`,
+  }))
+}
+
+function styleFromPersonality(personality: string[]) {
+  const lower = personality.map((p) => p.toLowerCase())
+  const isLuxury = lower.includes("luxury") || lower.includes("premium")
+  const isFun = lower.includes("fun") || lower.includes("playful")
+  const isMinimal = lower.includes("minimal") || lower.includes("modern")
+  return { isLuxury, isFun, isMinimal }
+}
+
+function themeForPersonality(personality: string[]): WebsiteTheme {
+  const { isLuxury, isFun } = styleFromPersonality(personality)
+  if (isLuxury) {
+    return { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", fontStyle: "serif" }
+  }
+  if (isFun) {
+    return { primaryColor: "#2563eb", backgroundColor: "#1e293b", fontStyle: "modern" }
+  }
+  return { primaryColor: "#2563eb", backgroundColor: "#0f172a", fontStyle: "sans" }
 }
 
 /**
@@ -99,25 +130,50 @@ export function mockGenerateFromBrandInput(input: BrandGeneratePayload): Generat
     .map((id) => PERSONALITY_LABELS[id] ?? id)
     .filter(Boolean)
     .join(", ")
+  const { isLuxury, isFun, isMinimal } = styleFromPersonality(input.personality)
+  const theme = themeForPersonality(input.personality)
 
   const titleSeed = services.split(/[,\n]/).map((s) => s.trim()).filter(Boolean)[0] ?? "Your business"
   const title = trim(titleSeed, 42)
 
-  const tagline = `${traits ? `${traits} service` : "Quality service"} in ${location}. ${goal.blurb}`
+  const baseTagline = `${traits ? `${traits} service` : "Quality service"} in ${location}.`
+  const tagline = isMinimal ? baseTagline : `${baseTagline} ${goal.blurb}`
 
-  const hero = `Welcome to a ${traits || "customer-first"} experience built for people in and around ${location}.\n\n${trim(services, 280)}\n\nPrimary goal: ${goal.label} — we shape the page so visitors know exactly how to take the next step.`
+  const heroHeading = isLuxury
+    ? `Elevate your experience with ${title}`
+    : isFun
+    ? `Make every visit feel exciting with ${title}`
+    : `Trusted ${title} for ${location}`
+  const heroSubtext = isMinimal
+    ? trim(`${services}. ${goal.blurb}`, 120)
+    : trim(
+        `${services}. We combine local expertise with a ${traits || "customer-first"} approach so visitors quickly become customers in ${location}.`,
+        220
+      )
 
-  const about = `Who we are\n\nWe combine ${traits || "a clear, confident voice"} with local know-how. Whether someone discovers you from search or a referral, they see honest copy, real services, and proof you serve ${location}.\n\n${goal.blurb}`
+  const about = isMinimal
+    ? `We deliver focused, high-quality service for ${location}. ${goal.blurb}`
+    : `We blend ${traits || "clear and confident"} communication with proven delivery standards. From first impression to repeat business, each part of your website supports trust, clarity, and conversion in ${location}.`
 
-  const servicesSection = `What we offer\n\n${formatServicesList(services)}\n\nReady to ${goal.cta.toLowerCase()}? This preview mirrors how the live hero, about, and services blocks will read once your site is published.`
+  const ctaText = isLuxury
+    ? "Ready for a premium experience? Let's start today."
+    : isFun
+    ? "Ready to get started? Let’s make something amazing together."
+    : "Ready to take the next step? Let's get started."
 
-  const sections: WebsiteSection[] = [
-    { type: "hero", content: hero },
-    { type: "about", content: about },
-    { type: "services", content: servicesSection },
+  const sections = [
+    {
+      type: "hero" as const,
+      heading: heroHeading,
+      subtext: heroSubtext,
+      buttonText: goal.cta,
+    },
+    { type: "about" as const, content: about },
+    { type: "services" as const, items: splitServiceItems(services) },
+    { type: "cta" as const, text: ctaText },
   ]
 
-  return { title, tagline, sections }
+  return { title, tagline, theme, sections }
 }
 
 /**
@@ -143,19 +199,38 @@ export function mockGenerateWebsite(input: GenerateWebsiteInput): GeneratedWebsi
   const about = `About ${name}\n\n${description ? `${description}\n\n` : ""}We built this page around a ${tone} voice and a ${style} visual style so visitors instantly understand who you are and why they should choose you. Every section is tuned for clarity: short paragraphs, scannable lists, and calls to action that match how people actually book or buy in ${industry}.`
 
   const servicesBody = industryServices(industry, name)
-  const services = `What we offer\n\n${servicesBody}\n\n${styleNote(style)} This block is ready to pair with icons, pricing tables, or booking buttons on the live site.`
+  const servicesItems = servicesBody
+    .split("\n")
+    .map((line) => line.replace(/^•\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 6)
+    .map((item) => ({
+      title: item,
+      description: `Built to deliver measurable value for ${industry} customers.`,
+    }))
 
-  const testimonials: WebsiteSection = {
-    type: "testimonials",
-    content: `“${name} made the whole process easy. We’d recommend them to anyone in ${industry}.” — Jordan P., repeat customer\n\n“We came in with a tight timeline. The team was ${tone} and kept us in the loop the whole way.” — Samira L., local client`,
-  }
+  const theme: WebsiteTheme =
+    tone.includes("premium") || style.includes("classic")
+      ? { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", fontStyle: "serif" }
+      : style.includes("minimal")
+      ? { primaryColor: "#2563eb", backgroundColor: "#111827", fontStyle: "modern" }
+      : { primaryColor: "#2563eb", backgroundColor: "#0f172a", fontStyle: "sans" }
 
-  const sections: WebsiteSection[] = [
-    { type: "hero", content: hero },
-    { type: "about", content: about },
-    { type: "services", content: services },
-    testimonials,
+  const sections = [
+    {
+      type: "hero" as const,
+      heading: `${name} — ${industry} done right`,
+      subtext: description || "Trusted by local customers who value quality, speed, and consistency.",
+      buttonText: "Get started",
+    },
+    { type: "about" as const, content: about },
+    { type: "services" as const, items: servicesItems },
+    { type: "cta" as const, text: `Ready to see what ${name} can do for you?` },
+    {
+      type: "testimonials" as const,
+      content: `“${name} made the whole process easy. We’d recommend them to anyone in ${industry}.” — Jordan P., repeat customer`,
+    },
   ]
 
-  return { title, tagline, sections }
+  return { title, tagline, theme, sections }
 }

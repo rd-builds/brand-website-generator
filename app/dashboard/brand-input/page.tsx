@@ -1,13 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { InputPanel, FormField, StyledInput, StyledTextarea, SelectableCard, SelectableChip } from "@/components/input-panel"
 import { AIPanel } from "@/components/ai-panel"
 import { GradientButton } from "@/components/ui/gradient-button"
 import { ProgressStep } from "@/components/ui/progress-step"
-import { requestBrandWebsiteGeneration } from "@/lib/generate-api"
 import { GENERATED_SITE_STORAGE_KEY } from "@/lib/generated-site-storage"
 import { 
   Phone, 
@@ -61,7 +59,6 @@ const conversionGoals = [
 ]
 
 export default function BrandInputPage() {
-  const router = useRouter()
   const [loading, setLoading] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
   
@@ -134,26 +131,45 @@ export default function BrandInputPage() {
     return suggestions
   }, [businessName, businessType, services, location, personalities, conversionGoal])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleGenerate = async () => {
     setSubmitError(null)
     setLoading(true)
+    console.log("clicked")
     try {
-      const site = await requestBrandWebsiteGeneration({
+      const formData = {
         services,
         location,
         personality: personalities,
         goal: conversionGoal,
+      }
+      console.log("formData", formData)
+
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       })
+      const site = await response.json()
+      console.log("generate response", site)
+
+      if (!response.ok || site?.ok === false) {
+        throw new Error(
+          typeof site?.error === "string"
+            ? site.error
+            : `Generate failed (${response.status})`
+        )
+      }
+
       const payload = {
         ...site,
         title: businessName.trim() || site.title,
         businessName: businessName.trim() || undefined,
         goalId: conversionGoal,
       }
-      sessionStorage.setItem(GENERATED_SITE_STORAGE_KEY, JSON.stringify(payload))
-      router.push("/preview")
+      localStorage.setItem(GENERATED_SITE_STORAGE_KEY, JSON.stringify(payload))
+      window.location.href = "/preview"
     } catch (err) {
+      console.error("generate error", err)
       setSubmitError(err instanceof Error ? err.message : "Could not generate your website.")
     } finally {
       setLoading(false)
@@ -170,7 +186,7 @@ export default function BrandInputPage() {
       </div>
 
       {/* Main content */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => e.preventDefault()}>
         <div className="grid gap-6 lg:grid-cols-5 lg:gap-8">
           {/* Left: Input Panel (60%) */}
           <div className="lg:col-span-3">
@@ -280,11 +296,12 @@ export default function BrandInputPage() {
               {/* Submit */}
               <div className="space-y-3 pt-4">
                 <GradientButton 
-                  type="submit" 
+                  type="button" 
                   size="lg" 
                   className="w-full sm:w-auto"
                   loading={loading}
                   disabled={!isFormValid || loading}
+                  onClick={handleGenerate}
                 >
                   {!loading && <Sparkles className="h-5 w-5" />}
                   {loading ? "Generating…" : "Generate My Website"}

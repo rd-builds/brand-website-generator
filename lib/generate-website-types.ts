@@ -15,16 +15,50 @@ export type BrandGeneratePayload = {
   goal: string
 }
 
-export type WebsiteSectionType = "hero" | "about" | "services" | "testimonials"
+export type WebsiteTheme = {
+  primaryColor: string
+  backgroundColor: string
+  fontStyle: "sans" | "serif" | "modern"
+}
 
-export type WebsiteSection = {
-  type: WebsiteSectionType
+export type HeroSection = {
+  type: "hero"
+  heading: string
+  subtext: string
+  buttonText: string
+}
+
+export type AboutSection = {
+  type: "about"
   content: string
 }
+
+export type ServicesSection = {
+  type: "services"
+  items: Array<{
+    title: string
+    description: string
+  }>
+}
+
+export type CtaSection = {
+  type: "cta"
+  text: string
+}
+
+export type WebsiteSectionType = "hero" | "about" | "services" | "cta" | "testimonials"
+
+export type WebsiteSection =
+  | HeroSection
+  | AboutSection
+  | ServicesSection
+  | CtaSection
+  | { type: "testimonials"; content: string }
 
 export type GeneratedWebsite = {
   title: string
   tagline: string
+  theme: WebsiteTheme
   sections: WebsiteSection[]
 }
 

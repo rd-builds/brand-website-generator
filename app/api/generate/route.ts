@@ -43,43 +43,49 @@ function parseBrandPayload(obj: Record<string, unknown>): BrandGeneratePayload {
 }
 
 export async function POST(request: Request) {
-  let body: unknown
   try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ ok: false, error: "Expected JSON body" }, { status: 400 })
-  }
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ ok: false, error: "Expected JSON body" }, { status: 400 })
+    }
 
-  if (!isRecord(body)) {
-    return NextResponse.json({ ok: false, error: "Invalid JSON object" }, { status: 400 })
-  }
+    if (!isRecord(body)) {
+      return NextResponse.json({ ok: false, error: "Invalid JSON object" }, { status: 400 })
+    }
 
-  if (isBrandGenerateBody(body)) {
-    const input = parseBrandPayload(body)
-    const generated = mockGenerateFromBrandInput(input)
+    if (isBrandGenerateBody(body)) {
+      const input = parseBrandPayload(body)
+      const generated = mockGenerateFromBrandInput(input)
+      return NextResponse.json({ ok: true, ...generated })
+    }
+
+    const name = pickString(body, "name").trim()
+    if (!name) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'Send either Brand Input fields { "services", "location", "personality", "goal" } or legacy { "name", ... }.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const legacy: GenerateWebsiteInput = {
+      name,
+      industry: pickString(body, "industry"),
+      style: pickString(body, "style"),
+      tone: pickString(body, "tone"),
+      description: pickString(body, "description"),
+    }
+
+    const generated = mockGenerateWebsite(legacy)
     return NextResponse.json({ ok: true, ...generated })
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unexpected error while generating website data"
+    return NextResponse.json({ ok: false, error: message }, { status: 500 })
   }
-
-  const name = pickString(body, "name").trim()
-  if (!name) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          'Send either Brand Input fields { "services", "location", "personality", "goal" } or legacy { "name", ... }.',
-      },
-      { status: 400 }
-    )
-  }
-
-  const legacy: GenerateWebsiteInput = {
-    name,
-    industry: pickString(body, "industry"),
-    style: pickString(body, "style"),
-    tone: pickString(body, "tone"),
-    description: pickString(body, "description"),
-  }
-
-  const generated = mockGenerateWebsite(legacy)
-  return NextResponse.json({ ok: true, ...generated })
 }

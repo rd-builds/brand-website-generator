@@ -5,16 +5,20 @@ const sectionLabels: Record<WebsiteSectionType, string> = {
   hero: "Hero",
   about: "About",
   services: "Services",
+  cta: "Call To Action",
   testimonials: "Testimonials",
 }
 
-function SectionBlock({
-  type,
-  content,
-}: {
-  type: WebsiteSectionType
-  content: string
-}) {
+function toSectionContent(site: GeneratedWebsite["sections"][number]): string {
+  if (site.type === "hero") return `${site.heading}\n${site.subtext}`
+  if (site.type === "about") return site.content
+  if (site.type === "services") return site.items.map((i) => `• ${i.title}: ${i.description}`).join("\n")
+  if (site.type === "cta") return site.text
+  if (site.type === "testimonials") return site.content
+  return ""
+}
+
+function SectionBlock({ type, content }: { type: WebsiteSectionType; content: string }) {
   return (
     <section className="rounded-xl border border-border bg-card/50 p-5 shadow-sm dark:bg-card/40">
       <p className="text-xs font-semibold uppercase tracking-wide text-primary">
@@ -60,7 +64,7 @@ export function GeneratedSitePreview({
             key={section.type}
             className={section.type === "hero" ? "md:col-span-2" : undefined}
           >
-            <SectionBlock type={section.type} content={section.content} />
+            <SectionBlock type={section.type} content={toSectionContent(section)} />
           </div>
         ))}
       </div>

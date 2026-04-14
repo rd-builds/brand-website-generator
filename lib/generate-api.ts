@@ -17,14 +17,25 @@ function isBrandPayload(p: GenerateApiPayload): p is BrandGeneratePayload {
 }
 
 async function parseGenerateResponse(res: Response): Promise<GeneratedWebsite> {
-  const data = (await res.json()) as GeneratedWebsite & { ok?: boolean; error?: string }
+  let data: (GeneratedWebsite & { ok?: boolean; error?: string }) | null = null
+  try {
+    data = (await res.json()) as GeneratedWebsite & { ok?: boolean; error?: string }
+  } catch {
+    throw new Error(`Generate returned invalid JSON (${res.status})`)
+  }
 
   if (!res.ok || data.ok === false) {
     throw new Error(typeof data.error === "string" ? data.error : `Generate failed (${res.status})`)
   }
 
   const { title, tagline, sections } = data
-  if (!title || !tagline || !Array.isArray(sections)) {
+  const theme = data.theme
+  const hasTheme =
+    !!theme &&
+    typeof theme.primaryColor === "string" &&
+    typeof theme.backgroundColor === "string" &&
+    typeof theme.fontStyle === "string"
+  if (!title || !tagline || !Array.isArray(sections) || !hasTheme) {
     throw new Error("Invalid response shape from /api/generate")
   }
 

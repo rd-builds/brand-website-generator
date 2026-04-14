@@ -13,10 +13,56 @@ import { PreviewGeneratedSite } from "@/components/preview-generated-site"
 function isGeneratedWebsite(v: unknown): v is GeneratedWebsite {
   if (!v || typeof v !== "object") return false
   const o = v as Record<string, unknown>
+  const theme = o.theme
+  const themeValid =
+    !!theme &&
+    typeof theme === "object" &&
+    typeof (theme as Record<string, unknown>).primaryColor === "string" &&
+    typeof (theme as Record<string, unknown>).backgroundColor === "string" &&
+    typeof (theme as Record<string, unknown>).fontStyle === "string"
+  const sections = o.sections
+  const sectionsValid =
+    Array.isArray(sections) &&
+    sections.every((item) => {
+      if (!item || typeof item !== "object") return false
+      const section = item as Record<string, unknown>
+      if (typeof section.type !== "string") return false
+      if (section.type === "hero") {
+        return (
+          typeof section.heading === "string" &&
+          typeof section.subtext === "string" &&
+          typeof section.buttonText === "string"
+        )
+      }
+      if (section.type === "about") {
+        return typeof section.content === "string"
+      }
+      if (section.type === "services") {
+        return (
+          Array.isArray(section.items) &&
+          section.items.every((svc) => {
+            if (!svc || typeof svc !== "object") return false
+            const itemObj = svc as Record<string, unknown>
+            return (
+              typeof itemObj.title === "string" &&
+              typeof itemObj.description === "string"
+            )
+          })
+        )
+      }
+      if (section.type === "cta") {
+        return typeof section.text === "string"
+      }
+      if (section.type === "testimonials") {
+        return typeof section.content === "string"
+      }
+      return false
+    })
   return (
     typeof o.title === "string" &&
     typeof o.tagline === "string" &&
-    Array.isArray(o.sections)
+    themeValid &&
+    sectionsValid
   )
 }
 
@@ -26,7 +72,7 @@ export default function PreviewPage() {
 
   React.useEffect(() => {
     try {
-      const raw = sessionStorage.getItem(GENERATED_SITE_STORAGE_KEY)
+      const raw = localStorage.getItem(GENERATED_SITE_STORAGE_KEY)
       if (!raw) {
         setStored(null)
         return
@@ -69,6 +115,7 @@ export default function PreviewPage() {
   const site: GeneratedWebsite = {
     title: stored.title,
     tagline: stored.tagline,
+    theme: stored.theme,
     sections: stored.sections as GeneratedWebsite["sections"],
   }
 
