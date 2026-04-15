@@ -19,7 +19,10 @@ function isGeneratedWebsite(v: unknown): v is GeneratedWebsite {
     typeof theme === "object" &&
     typeof (theme as Record<string, unknown>).primaryColor === "string" &&
     typeof (theme as Record<string, unknown>).backgroundColor === "string" &&
-    typeof (theme as Record<string, unknown>).fontStyle === "string"
+    ((theme as Record<string, unknown>).fontStyle === undefined ||
+      typeof (theme as Record<string, unknown>).fontStyle === "string") &&
+    ((theme as Record<string, unknown>).accentColor === undefined ||
+      typeof (theme as Record<string, unknown>).accentColor === "string")
   const sections = o.sections
   const sectionsValid =
     Array.isArray(sections) &&
@@ -72,12 +75,15 @@ export default function PreviewPage() {
 
   React.useEffect(() => {
     try {
+      const fallbackData = JSON.parse(localStorage.getItem("siteData") || "{}") as unknown
       const raw = localStorage.getItem(GENERATED_SITE_STORAGE_KEY)
-      if (!raw) {
+      const parsed = raw ? (JSON.parse(raw) as unknown) : fallbackData
+
+      if (!parsed || (typeof parsed === "object" && Object.keys(parsed as Record<string, unknown>).length === 0)) {
         setStored(null)
         return
       }
-      const parsed = JSON.parse(raw) as unknown
+
       if (isGeneratedWebsite(parsed)) {
         setStored(parsed as StoredGeneratedSite)
       } else {

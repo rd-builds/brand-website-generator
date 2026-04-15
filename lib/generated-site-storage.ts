@@ -7,7 +7,8 @@ export type StoredGeneratedSite = {
   theme: {
     primaryColor: string
     backgroundColor: string
-    fontStyle: "sans" | "serif" | "modern"
+    accentColor?: string
+    fontStyle?: "sans" | "serif" | "modern"
   }
   sections: Array<Record<string, unknown>>
   /** Optional: improves preview title + primary CTA. */

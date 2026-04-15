@@ -132,41 +132,46 @@ export default function BrandInputPage() {
   }, [businessName, businessType, services, location, personalities, conversionGoal])
 
   const handleGenerate = async () => {
+    console.log("clicked")
     setSubmitError(null)
     setLoading(true)
-    console.log("clicked")
     try {
-      const formData = {
+      const personality = personalities
+      const goal = conversionGoal
+      const requestPayload = {
         services,
         location,
-        personality: personalities,
-        goal: conversionGoal,
+        personality,
+        goal,
       }
-      console.log("formData", formData)
+      console.log("formData", requestPayload)
 
-      const response = await fetch("/api/generate", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestPayload),
       })
-      const site = await response.json()
-      console.log("generate response", site)
 
-      if (!response.ok || site?.ok === false) {
+      console.log("generate response status", res.status)
+      const data = await res.json()
+      console.log(data)
+
+      if (!res.ok || data?.ok === false) {
         throw new Error(
-          typeof site?.error === "string"
-            ? site.error
-            : `Generate failed (${response.status})`
+          typeof data?.error === "string"
+            ? data.error
+            : `Generate failed (${res.status})`
         )
       }
 
-      const payload = {
-        ...site,
-        title: businessName.trim() || site.title,
+      const storedPayload = {
+        ...data,
+        title: businessName.trim() || data.title,
         businessName: businessName.trim() || undefined,
         goalId: conversionGoal,
       }
-      localStorage.setItem(GENERATED_SITE_STORAGE_KEY, JSON.stringify(payload))
+      localStorage.setItem("siteData", JSON.stringify(storedPayload))
+      localStorage.setItem(GENERATED_SITE_STORAGE_KEY, JSON.stringify(storedPayload))
       window.location.href = "/preview"
     } catch (err) {
       console.error("generate error", err)
@@ -304,7 +309,7 @@ export default function BrandInputPage() {
                   onClick={handleGenerate}
                 >
                   {!loading && <Sparkles className="h-5 w-5" />}
-                  {loading ? "Generating…" : "Generate My Website"}
+                  {loading ? "Generating..." : "Generate My Website"}
                 </GradientButton>
                 {submitError && (
                   <p className="text-sm text-destructive" role="alert">

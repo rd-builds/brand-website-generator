@@ -18,7 +18,8 @@ export type BrandGeneratePayload = {
 export type WebsiteTheme = {
   primaryColor: string
   backgroundColor: string
-  fontStyle: "sans" | "serif" | "modern"
+  accentColor?: string
+  fontStyle?: "sans" | "serif" | "modern"
 }
 
 export type HeroSection = {

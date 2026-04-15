@@ -184,6 +184,7 @@
     @apply border-border outline-ring/50;
   }
   html {
+    scroll-behavior: smooth;
     transition:
       background-color 0.35s ease,
       color 0.35s ease;

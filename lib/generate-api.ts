@@ -34,12 +34,13 @@ async function parseGenerateResponse(res: Response): Promise<GeneratedWebsite> {
     !!theme &&
     typeof theme.primaryColor === "string" &&
     typeof theme.backgroundColor === "string" &&
-    typeof theme.fontStyle === "string"
+    (theme.fontStyle === undefined || typeof theme.fontStyle === "string") &&
+    (theme.accentColor === undefined || typeof theme.accentColor === "string")
   if (!title || !tagline || !Array.isArray(sections) || !hasTheme) {
     throw new Error("Invalid response shape from /api/generate")
   }
 
-  return { title, tagline, sections }
+  return { title, tagline, theme, sections }
 }
 
 /** Brand Input page or any client sending the four brand fields. */

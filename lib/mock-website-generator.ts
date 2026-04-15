@@ -106,12 +106,12 @@ function styleFromPersonality(personality: string[]) {
 function themeForPersonality(personality: string[]): WebsiteTheme {
   const { isLuxury, isFun } = styleFromPersonality(personality)
   if (isLuxury) {
-    return { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", fontStyle: "serif" }
+    return { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "serif" }
   }
   if (isFun) {
-    return { primaryColor: "#2563eb", backgroundColor: "#1e293b", fontStyle: "modern" }
+    return { primaryColor: "#2563eb", backgroundColor: "#1e293b", accentColor: "#60a5fa", fontStyle: "modern" }
   }
-  return { primaryColor: "#2563eb", backgroundColor: "#0f172a", fontStyle: "sans" }
+  return { primaryColor: "#2563eb", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "sans" }
 }
 
 /**
@@ -211,10 +211,10 @@ export function mockGenerateWebsite(input: GenerateWebsiteInput): GeneratedWebsi
 
   const theme: WebsiteTheme =
     tone.includes("premium") || style.includes("classic")
-      ? { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", fontStyle: "serif" }
+      ? { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "serif" }
       : style.includes("minimal")
-      ? { primaryColor: "#2563eb", backgroundColor: "#111827", fontStyle: "modern" }
-      : { primaryColor: "#2563eb", backgroundColor: "#0f172a", fontStyle: "sans" }
+      ? { primaryColor: "#2563eb", backgroundColor: "#111827", accentColor: "#60a5fa", fontStyle: "modern" }
+      : { primaryColor: "#2563eb", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "sans" }
 
   const sections = [
     {
