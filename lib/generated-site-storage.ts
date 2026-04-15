@@ -5,9 +5,9 @@ export type StoredGeneratedSite = {
   title: string
   tagline: string
   theme: {
-    primaryColor: string
-    backgroundColor: string
-    accentColor?: string
+    layoutStyle: string
+    light: { bg: string, text: string, primary: string }
+    dark: { bg: string, text: string, primary: string }
     fontStyle?: "sans" | "serif" | "modern"
   }
   sections: Array<Record<string, unknown>>

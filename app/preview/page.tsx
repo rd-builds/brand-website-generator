@@ -17,12 +17,9 @@ function isGeneratedWebsite(v: unknown): v is GeneratedWebsite {
   const themeValid =
     !!theme &&
     typeof theme === "object" &&
-    typeof (theme as Record<string, unknown>).primaryColor === "string" &&
-    typeof (theme as Record<string, unknown>).backgroundColor === "string" &&
-    ((theme as Record<string, unknown>).fontStyle === undefined ||
-      typeof (theme as Record<string, unknown>).fontStyle === "string") &&
-    ((theme as Record<string, unknown>).accentColor === undefined ||
-      typeof (theme as Record<string, unknown>).accentColor === "string")
+    typeof (theme as Record<string, unknown>).layoutStyle === "string" &&
+    typeof (theme as Record<string, unknown>).light === "object" &&
+    typeof (theme as Record<string, unknown>).dark === "object"
   const sections = o.sections
   const sectionsValid =
     Array.isArray(sections) &&
@@ -128,8 +125,8 @@ export default function PreviewPage() {
   return (
     <PreviewGeneratedSite
       site={site}
-      goalId={stored.goalId}
-      businessName={stored.businessName}
+      goalId={(stored as StoredGeneratedSite).goalId}
+      businessName={(stored as StoredGeneratedSite).businessName}
     />
   )
 }

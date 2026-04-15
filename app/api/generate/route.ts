@@ -2,36 +2,30 @@ import type { BrandGeneratePayload, GenerateWebsiteInput } from "@/lib/generate-
 import { mockGenerateFromBrandInput, mockGenerateWebsite } from "@/lib/mock-website-generator"
 
 const themes = {
-  Professional: {
-    primaryColor: "#1d4ed8",
-    backgroundColor: "#f8fafc",
-    accentColor: "#2563eb",
-  },
-  "Friendly & Warm": {
-    primaryColor: "#f97316",
-    backgroundColor: "#fff7ed",
-    accentColor: "#fb923c",
-  },
   "Premium & Luxury": {
-    primaryColor: "#eab308",
-    backgroundColor: "#0a0a0a",
-    accentColor: "#facc15",
-  },
-  "Modern & Minimal": {
-    primaryColor: "#111827",
-    backgroundColor: "#ffffff",
-    accentColor: "#6b7280",
+    light: { bg: "#ffffff", text: "#111111", primary: "#d4af37" },
+    dark: { bg: "#0a0a0a", text: "#ffffff", primary: "#facc15" }
   },
   "Playful & Fun": {
-    primaryColor: "#ec4899",
-    backgroundColor: "#fdf2f8",
-    accentColor: "#f472b6",
+    light: { bg: "#fdf2f8", text: "#111111", primary: "#ec4899" },
+    dark: { bg: "#1f2937", text: "#ffffff", primary: "#f472b6" }
   },
-  Trustworthy: {
-    primaryColor: "#06b6d4",
-    backgroundColor: "#ecfeff",
-    accentColor: "#22d3ee",
+  "Professional": {
+    light: { bg: "#f8fafc", text: "#111111", primary: "#2563eb" },
+    dark: { bg: "#0f172a", text: "#ffffff", primary: "#3b82f6" }
   },
+  "Modern & Minimal": {
+    light: { bg: "#ffffff", text: "#333333", primary: "#000000" },
+    dark: { bg: "#000000", text: "#eeeeee", primary: "#ffffff" }
+  },
+  "Trustworthy": {
+    light: { bg: "#ecfeff", text: "#0f172a", primary: "#0891b2" },
+    dark: { bg: "#083344", text: "#f8fafc", primary: "#22d3ee" }
+  },
+  "Friendly & Warm": {
+    light: { bg: "#fff7ed", text: "#431407", primary: "#ea580c" },
+    dark: { bg: "#431407", text: "#ffedd5", primary: "#f97316" }
+  }
 } as const
 
 const personalityLabels: Record<string, keyof typeof themes> = {
@@ -112,6 +106,7 @@ export async function POST(request: Request) {
           ? (selected as keyof typeof themes)
           : (personalityLabels[selected.toLowerCase()] ?? "Professional")
       const theme = {
+        layoutStyle: selectedLabel,
         ...themes[selectedLabel],
         fontStyle:
           selectedLabel === "Premium & Luxury"

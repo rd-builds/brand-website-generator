@@ -104,14 +104,17 @@ function styleFromPersonality(personality: string[]) {
 }
 
 function themeForPersonality(personality: string[]): WebsiteTheme {
-  const { isLuxury, isFun } = styleFromPersonality(personality)
+  const { isLuxury, isFun, isMinimal } = styleFromPersonality(personality)
   if (isLuxury) {
-    return { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "serif" }
+    return { layoutStyle: "Premium & Luxury", light: { bg: "#ffffff", text: "#111111", primary: "#d4af37" }, dark: { bg: "#0a0a0a", text: "#ffffff", primary: "#facc15" }, fontStyle: "serif" }
   }
   if (isFun) {
-    return { primaryColor: "#2563eb", backgroundColor: "#1e293b", accentColor: "#60a5fa", fontStyle: "modern" }
+    return { layoutStyle: "Playful & Fun", light: { bg: "#fdf2f8", text: "#111111", primary: "#ec4899" }, dark: { bg: "#1f2937", text: "#ffffff", primary: "#f472b6" }, fontStyle: "modern" }
   }
-  return { primaryColor: "#2563eb", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "sans" }
+  if (isMinimal) {
+    return { layoutStyle: "Modern & Minimal", light: { bg: "#ffffff", text: "#333333", primary: "#000000" }, dark: { bg: "#000000", text: "#eeeeee", primary: "#ffffff" }, fontStyle: "modern" }
+  }
+  return { layoutStyle: "Professional", light: { bg: "#f8fafc", text: "#111111", primary: "#2563eb" }, dark: { bg: "#0f172a", text: "#ffffff", primary: "#3b82f6" }, fontStyle: "sans" }
 }
 
 /**
@@ -211,10 +214,10 @@ export function mockGenerateWebsite(input: GenerateWebsiteInput): GeneratedWebsi
 
   const theme: WebsiteTheme =
     tone.includes("premium") || style.includes("classic")
-      ? { primaryColor: "#1d4ed8", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "serif" }
+      ? { layoutStyle: "Premium & Luxury", light: { bg: "#ffffff", text: "#111111", primary: "#d4af37" }, dark: { bg: "#0a0a0a", text: "#ffffff", primary: "#facc15" }, fontStyle: "serif" }
       : style.includes("minimal")
-      ? { primaryColor: "#2563eb", backgroundColor: "#111827", accentColor: "#60a5fa", fontStyle: "modern" }
-      : { primaryColor: "#2563eb", backgroundColor: "#0f172a", accentColor: "#3b82f6", fontStyle: "sans" }
+      ? { layoutStyle: "Modern & Minimal", light: { bg: "#ffffff", text: "#333333", primary: "#000000" }, dark: { bg: "#000000", text: "#eeeeee", primary: "#ffffff" }, fontStyle: "modern" }
+      : { layoutStyle: "Professional", light: { bg: "#f8fafc", text: "#111111", primary: "#2563eb" }, dark: { bg: "#0f172a", text: "#ffffff", primary: "#3b82f6" }, fontStyle: "sans" }
 
   const sections = [
     {

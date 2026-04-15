@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { 
   Sparkles, 
   ChevronDown,
@@ -18,6 +19,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { ContactFormFooter } from "@/components/contact-form-footer"
 
 export default function LandingPage() {
+  const router = useRouter()
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Background Gradient */}
@@ -90,8 +93,8 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-50 mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5">
-        <div className="flex items-center justify-between">
+      <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500">
@@ -106,40 +109,38 @@ export default function LandingPage() {
               Products
               <ChevronDown className="h-4 w-4" />
             </button>
-            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth">
+            <a href="#about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth">
               About
-            </Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth">
-              Customers
-            </Link>
-            <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth">
+            </a>
+            <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth">
+              Services
+            </a>
+            <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth">
               Pricing
-            </Link>
+            </a>
           </div>
 
           {/* Right Side CTAs */}
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
-            <Link 
-              href="#" 
+            <button 
+              onClick={() => router.push("/login")}
               className="hidden sm:block text-sm font-medium text-muted-foreground hover:text-foreground transition-smooth"
             >
-              Sign in
-            </Link>
-            <Link href="/dashboard/brand-input" className="w-full sm:w-auto">
-              <button className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-premium hover:bg-foreground/90 hover:shadow-lg dark:hover:shadow-primary/20">
-                Get started
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </Link>
+              Sign In
+            </button>
+            <button 
+              onClick={() => router.push("/signup")}
+              className="inline-flex items-center w-full sm:w-auto gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-premium hover:bg-foreground/90 hover:shadow-lg dark:hover:shadow-primary/20"
+            >
+              Sign Up
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10">
+      <main id="hero" className="relative z-10 pt-20">
         <div className="mx-auto max-w-4xl px-4 pt-14 pb-14 text-center sm:px-6 sm:pt-20 sm:pb-16">
           {/* Icon Badge */}
           <div className="mb-8 inline-flex items-center justify-center">
@@ -285,7 +286,15 @@ export default function LandingPage() {
         </div>
 
         {/* Stats Section */}
-        <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20">
+        <div id="about" className="mx-auto max-w-5xl px-4 pb-16 pt-8 sm:px-6 sm:pb-20 scroll-mt-24">
+          <div className="mb-14 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+              Empowering local businesses online
+            </h2>
+            <p className="mx-auto max-w-3xl text-lg text-muted-foreground leading-relaxed">
+              At Clear, we believe that every small business deserves a stunning, high-converting digital presence without the complexities of traditional web development. By harnessing the power of artificial intelligence, we have streamlined the process so you can focus on what matters most—running your business.
+            </p>
+          </div>
           <div className="grid gap-6 sm:grid-cols-3 sm:gap-8">
             {[
               { value: "10,000+", label: "Websites created", icon: Globe },
@@ -304,7 +313,7 @@ export default function LandingPage() {
         </div>
 
         {/* Features Section */}
-        <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20">
+        <div id="services" className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20 scroll-mt-24">
           <div className="mb-10 text-center sm:mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
               Why local businesses choose Clear
@@ -346,9 +355,81 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mx-auto max-w-4xl px-4 pb-20 text-center sm:px-6 sm:pb-24">
-          <div className="glass-card-elevated rounded-3xl p-6 sm:p-10 dark:border dark:border-slate-700/60">
+        {/* Pricing Section */}
+        <div id="pricing" className="mx-auto max-w-5xl px-4 pb-20 sm:px-6 sm:pb-24 scroll-mt-24">
+          <div className="mb-14 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Simple, transparent pricing</h2>
+            <p className="mx-auto max-w-2xl text-muted-foreground leading-7">
+              Start building for free. Upgrade when you're ready to publish and scale your online presence.
+            </p>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 max-w-4xl mx-auto text-left mb-16">
+            {/* Free Plan */}
+            <div className="glass-card rounded-3xl p-8 dark:border-slate-700/80 hover-lift flex flex-col">
+              <h3 className="text-xl font-bold text-foreground">Starter</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Perfect for trying out our AI builder.</p>
+              <div className="my-6">
+                <span className="text-4xl font-bold text-foreground">$0</span>
+                <span className="text-muted-foreground">/ forever</span>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> 1 AI-generated website
+                </li>
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> Basic customization
+                </li>
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> Clear subdomain
+                </li>
+              </ul>
+              <button 
+                onClick={() => router.push("/signup")}
+                className="w-full rounded-xl border border-border bg-background py-3 text-sm font-semibold text-foreground hover:bg-muted transition-smooth"
+              >
+                Start for free
+              </button>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="glass-card-elevated relative rounded-3xl p-8 border-primary/20 dark:border-primary/20 bg-gradient-to-br from-primary/5 to-transparent flex flex-col">
+              <div className="absolute top-0 right-8 -translate-y-1/2">
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white shadow-lg shadow-primary/30">
+                  Most Popular
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-foreground">Professional</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Everything you need to grow your business.</p>
+              <div className="my-6">
+                <span className="text-4xl font-bold text-foreground">$29</span>
+                <span className="text-muted-foreground">/ month</span>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> Unlimited regeneration
+                </li>
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> Custom domain support
+                </li>
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> Advanced SEO tools
+                </li>
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> Priority support
+                </li>
+              </ul>
+              <button 
+                onClick={() => router.push("/signup")}
+                className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:bg-primary/90 transition-smooth"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="glass-card-elevated max-w-4xl mx-auto rounded-3xl p-6 text-center sm:p-10 dark:border dark:border-slate-700/60">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
               Ready to build your website?
             </h2>

@@ -15,10 +15,16 @@ export type BrandGeneratePayload = {
   goal: string
 }
 
+export type ThemeColors = {
+  bg: string
+  text: string
+  primary: string
+}
+
 export type WebsiteTheme = {
-  primaryColor: string
-  backgroundColor: string
-  accentColor?: string
+  layoutStyle: "Professional" | "Premium & Luxury" | "Playful & Fun" | "Modern & Minimal" | "Trustworthy" | "Friendly & Warm"
+  light: ThemeColors
+  dark: ThemeColors
   fontStyle?: "sans" | "serif" | "modern"
 }
 

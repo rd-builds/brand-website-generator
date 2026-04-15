@@ -32,10 +32,9 @@ async function parseGenerateResponse(res: Response): Promise<GeneratedWebsite> {
   const theme = data.theme
   const hasTheme =
     !!theme &&
-    typeof theme.primaryColor === "string" &&
-    typeof theme.backgroundColor === "string" &&
-    (theme.fontStyle === undefined || typeof theme.fontStyle === "string") &&
-    (theme.accentColor === undefined || typeof theme.accentColor === "string")
+    typeof theme.layoutStyle === "string" &&
+    typeof theme.light === "object" && theme.light !== null &&
+    typeof theme.dark === "object" && theme.dark !== null
   if (!title || !tagline || !Array.isArray(sections) || !hasTheme) {
     throw new Error("Invalid response shape from /api/generate")
   }
